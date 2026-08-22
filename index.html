@@ -6,6 +6,20 @@
 <title>John Rodgerson D. Bilan — Full-Stack Developer &amp; Performance Marketing</title>
 <meta name="description" content="I build the systems small businesses run on. Full-stack developer and Meta Ads specialist. Solo-built Bloom OS, a production operations platform running three retail branches.">
 
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23121110'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='19' font-weight='700' fill='%23c8a96e' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#121110">
+<link rel="canonical" href="https://jae-wya.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jae-wya.github.io/">
+<meta property="og:title" content="John Rodgerson D. Bilan — Full-Stack Developer &amp; Performance Marketing">
+<meta property="og:description" content="I build the systems small businesses actually run on. Shipped a production operations platform for a three-branch retailer, and run their Meta Ads at 8.72x return on ad spend.">
+<meta property="og:image" content="https://jae-wya.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="John Rodgerson D. Bilan — Full-Stack Developer">
+<meta name="twitter:description" content="I build the systems small businesses actually run on.">
+<meta name="twitter:image" content="https://jae-wya.github.io/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -507,8 +521,8 @@
       <div class="decisions">
         <div class="dec rise">
           <span class="tag">Authentication</span>
-          <h3>A numeric PIN, not an email login</h3>
-          <p>Staff share terminals and work with wet hands. Email and passwords would have been abandoned inside a week. PINs are hashed with SHA-256 and backed by server-side session tokens — simple to use, not simple underneath.</p>
+          <h3>A login staff would actually use</h3>
+          <p>Staff share terminals and work with wet hands. Email-and-password sign-in would have been abandoned inside a week, so I built passwordless access instead — a short code, hashed and session-backed. Simple to use, not simple underneath.</p>
         </div>
         <div class="dec rise">
           <span class="tag">Data intake</span>
@@ -518,17 +532,17 @@
         <div class="dec rise">
           <span class="tag">Storage</span>
           <h3>Photos that survive a restart</h3>
-          <p>The host wipes local files on every restart — the first version silently lost uploads. Every photo moved to object storage with public read policies, making them permanent and reachable from a rider's phone in the field.</p>
+          <p>The host wipes local files on every restart — the first version silently lost uploads. I moved every photo to object storage, making them permanent and reachable from a rider's phone in the field.</p>
         </div>
         <div class="dec rise">
           <span class="tag">Performance</span>
           <h3>Scaled before the volume arrived</h3>
-          <p>Reads are cached with version-keyed invalidation, so navigation is instant but your own edits appear immediately. Order history paginates and defaults to 60 days, with indexes on the seven columns that actually get filtered.</p>
+          <p>Reads are cached, but any write clears the cache — so navigation feels instant while your own edits still appear immediately. The failure mode that makes internal tools feel broken is seeing stale data right after you changed something. Order history is paginated and indexed on the columns that actually get filtered, built before the volume demanded it.</p>
         </div>
         <div class="dec rise">
           <span class="tag">Fulfilment</span>
           <h3>A printable waybill per order</h3>
-          <p>Each order generates an A5 sheet carrying the arrangement spec, delivery window, recipient details, and a QR linking to a rider delivery page. The QR renders as inline SVG — browsers strip data-URI images when printing, which produced blank codes in the field until it was traced.</p>
+          <p>Each order generates an A5 sheet carrying the arrangement spec, delivery window, recipient details, and a QR the rider scans on arrival. Riders kept reporting blank QR codes on printed sheets — the cause turned out to be browsers dropping embedded images at print time, invisible on screen and only ever visible in the field.</p>
         </div>
         <div class="dec rise">
           <span class="tag">Visibility</span>
@@ -539,10 +553,10 @@
 
       <table class="stack">
         <tr><td>Frontend</td><td>Python &middot; Streamlit — session-based navigation with role-scoped page access</td></tr>
-        <tr><td>Database</td><td>Supabase (PostgreSQL) — 14 tables, row-level security enabled</td></tr>
-        <tr><td>Storage</td><td>Supabase Storage — inspiration photos, payment proof, delivery proof</td></tr>
-        <tr><td>Edge compute</td><td>Supabase Edge Functions (Deno / TypeScript) — public rider delivery page</td></tr>
-        <tr><td>Auth</td><td>PIN + SHA-256 + server-side session tokens</td></tr>
+        <tr><td>Database</td><td>Supabase (PostgreSQL) — relational schema with row-level access control</td></tr>
+        <tr><td>Storage</td><td>Object storage — inspiration photos, payment proof, delivery proof</td></tr>
+        <tr><td>Edge compute</td><td>Serverless functions (TypeScript) — rider-facing delivery page</td></tr>
+        <tr><td>Auth</td><td>Passwordless, session-backed, role-scoped</td></tr>
         <tr><td>Deployment</td><td>GitHub &rarr; Streamlit Cloud — push to main is live in about two minutes</td></tr>
         <tr><td>Running cost</td><td>&#8369;0 per month, entirely on free tiers</td></tr>
       </table>
@@ -667,7 +681,10 @@
         <span class="k">GitHub</span><span class="v">github.com/jae-wya</span>
       </a>
       <a class="cline rise" href="https://jae-wya.github.io/jr_bilan_cv.docx" download>
-        <span class="k">Download CV</span><span class="v">jr_bilan_cv.docx</span>
+        <span class="k">Download CV</span><span class="v">One page &middot; .docx</span>
+      </a>
+      <a class="cline rise" href="https://jae-wya.github.io/bloom_os_case_study.docx" download>
+        <span class="k">Full case study</span><span class="v">Three pages &middot; .docx</span>
       </a>
       <div class="cline rise">
         <span class="k">Bloom OS source</span><span class="v">Available on request</span>
