@@ -1176,7 +1176,7 @@
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({messages: history})
     }).then(function(res){
-      if(!res.ok) throw new Error('http ' + res.status);
+      if(!res.ok){ history.pop(); throw new Error('http ' + res.status); }
       return res.json();
     }).then(function(data){
       typing.remove();
@@ -1187,6 +1187,7 @@
       input.focus();
     }).catch(function(){
       typing.remove();
+      history.pop(); // remove the failed user message so roles stay alternating
       addMsg('err','Server is waking up — wait 30 seconds and try again.');
       setDisabled(false);
     });
