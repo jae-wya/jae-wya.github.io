@@ -1177,44 +1177,17 @@
       body: JSON.stringify({messages: history})
     }).then(function(res){
       if(!res.ok) throw new Error('http ' + res.status);
-      var reader = res.body.getReader();
-      var decoder = new TextDecoder();
-      var buf = '';
-      var botText = '';
-      var botEl = null;
-
-      function read(){
-        reader.read().then(function(r){
-          if(r.done){
-            if(botText){ history.push({role:'assistant',content:botText}); }
-            setDisabled(false); input.focus(); return;
-          }
-          buf += decoder.decode(r.value, {stream:true});
-          var lines = buf.split('\n');
-          buf = lines.pop();
-          lines.forEach(function(line){
-            line = line.trim();
-            if(!line.startsWith('data: ')) return;
-            var chunk = line.slice(6).trim();
-            if(!chunk) return;
-            if(chunk === '[DONE]'){ history.push({role:'assistant',content:botText}); setDisabled(false); input.focus(); return; }
-            if(chunk === '[ERROR]'){ typing.remove(); addMsg('err','Something went wrong — try again.'); setDisabled(false); return; }
-            chunk = chunk.replace(/\\n/g, '\n');
-            if(!botEl){ typing.remove(); botEl = addMsg('bot',''); }
-            botText += chunk;
-            botEl.textContent = botText;
-            msgs.scrollTop = msgs.scrollHeight;
-          });
-          read();
-        }).catch(function(){
-          if(botText){ history.push({role:'assistant',content:botText}); setDisabled(false); }
-          else { typing.remove(); addMsg('err','Connection lost — try again.'); setDisabled(false); }
-        });
-      }
-      read();
+      return res.json();
+    }).then(function(data){
+      typing.remove();
+      var text = data.text || '(no response)';
+      addMsg('bot', text);
+      history.push({role:'assistant', content:text});
+      setDisabled(false);
+      input.focus();
     }).catch(function(){
       typing.remove();
-      addMsg('err','Server is waking up (free tier cold start). Wait 30 seconds and try again.');
+      addMsg('err','Server is waking up — wait 30 seconds and try again.');
       setDisabled(false);
     });
   }
