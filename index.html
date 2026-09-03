@@ -1185,13 +1185,18 @@
 
       function read(){
         reader.read().then(function(r){
-          if(r.done) return;
+          if(r.done){
+            if(botText){ history.push({role:'assistant',content:botText}); }
+            setDisabled(false); input.focus(); return;
+          }
           buf += decoder.decode(r.value, {stream:true});
           var lines = buf.split('\n');
           buf = lines.pop();
           lines.forEach(function(line){
+            line = line.trim();
             if(!line.startsWith('data: ')) return;
-            var chunk = line.slice(6);
+            var chunk = line.slice(6).trim();
+            if(!chunk) return;
             if(chunk === '[DONE]'){ history.push({role:'assistant',content:botText}); setDisabled(false); input.focus(); return; }
             if(chunk === '[ERROR]'){ typing.remove(); addMsg('err','Something went wrong — try again.'); setDisabled(false); return; }
             chunk = chunk.replace(/\\n/g, '\n');
@@ -1201,6 +1206,9 @@
             msgs.scrollTop = msgs.scrollHeight;
           });
           read();
+        }).catch(function(){
+          if(botText){ history.push({role:'assistant',content:botText}); setDisabled(false); }
+          else { typing.remove(); addMsg('err','Connection lost — try again.'); setDisabled(false); }
         });
       }
       read();
