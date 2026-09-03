@@ -1185,6 +1185,24 @@
       history.push({role:'assistant', content:text});
       setDisabled(false);
       input.focus();
+      // detect handoff: if bot response contains email confirmation language, send lead to Formspree
+      var lower = text.toLowerCase();
+      if((lower.indexOf('noted') > -1 || lower.indexOf('reach out') > -1 || lower.indexOf('pass') > -1) && lower.indexOf('@') > -1){
+        // extract email from conversation
+        var emailMatch = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+        var leadEmail = emailMatch ? emailMatch[0] : 'unknown';
+        // find name from previous messages
+        var fullConvo = history.map(function(m){ return m.role + ': ' + m.content; }).join('\n');
+        fetch('https://formspree.io/f/mkjnbygj', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+          body: JSON.stringify({
+            email: leadEmail,
+            message: fullConvo,
+            _subject: 'New lead via Kiwi — ' + leadEmail
+          })
+        });
+      }
     }).catch(function(){
       typing.remove();
       history = [];
