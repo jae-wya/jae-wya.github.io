@@ -1122,5 +1122,104 @@
   </div>
 </div>
 
+<script>
+// ── Chat widget ───────────────────────────────────────
+(function(){
+  var API = 'https://order-parser-api.onrender.com/chat';
+  var btn   = document.getElementById('chat-btn');
+  var box   = document.getElementById('chat-box');
+  var msgs  = document.getElementById('chat-msgs');
+  var input = document.getElementById('chat-input');
+  var send  = document.getElementById('chat-send');
+  var close = document.getElementById('chat-close');
+  var history = [];
+
+  btn.addEventListener('click', function(){
+    box.classList.toggle('open');
+    if(box.classList.contains('open')) input.focus();
+  });
+  close.addEventListener('click', function(){ box.classList.remove('open'); });
+
+  function addMsg(role, text){
+    var d = document.createElement('div');
+    d.className = 'cm ' + (role === 'user' ? 'usr' : role === 'err' ? 'err' : 'bot');
+    d.textContent = text;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    return d;
+  }
+
+  function addTyping(){
+    var d = document.createElement('div');
+    d.className = 'cm bot';
+    d.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    return d;
+  }
+
+  function setDisabled(v){ send.disabled = v; input.disabled = v; }
+
+  function submit(){
+    var text = input.value.trim();
+    if(!text) return;
+    input.value = '';
+    input.style.height = '';
+    addMsg('user', text);
+    history.push({role:'user', content:text});
+    setDisabled(true);
+
+    var typing = addTyping();
+
+    fetch(API, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({messages: history})
+    }).then(function(res){
+      if(!res.ok) throw new Error('http ' + res.status);
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+      var botText = '';
+      var botEl = null;
+
+      function read(){
+        reader.read().then(function(r){
+          if(r.done) return;
+          buf += decoder.decode(r.value, {stream:true});
+          var lines = buf.split('\n');
+          buf = lines.pop();
+          lines.forEach(function(line){
+            if(!line.startsWith('data: ')) return;
+            var chunk = line.slice(6);
+            if(chunk === '[DONE]'){ history.push({role:'assistant',content:botText}); setDisabled(false); input.focus(); return; }
+            if(chunk === '[ERROR]'){ typing.remove(); addMsg('err','Something went wrong — try again.'); setDisabled(false); return; }
+            chunk = chunk.replace(/\\n/g, '\n');
+            if(!botEl){ typing.remove(); botEl = addMsg('bot',''); }
+            botText += chunk;
+            botEl.textContent = botText;
+            msgs.scrollTop = msgs.scrollHeight;
+          });
+          read();
+        });
+      }
+      read();
+    }).catch(function(){
+      typing.remove();
+      addMsg('err','Could not reach the server. It may be waking up — wait 30 seconds and try again.');
+      setDisabled(false);
+    });
+  }
+
+  send.addEventListener('click', submit);
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submit(); }
+  });
+  input.addEventListener('input', function(){
+    this.style.height = '';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+})();
+</script>
 </body>
 </html>
