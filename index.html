@@ -1185,14 +1185,19 @@
       history.push({role:'assistant', content:text});
       setDisabled(false);
       input.focus();
-      // detect handoff: if bot response contains email confirmation language, send lead to Formspree
+      // detect handoff: trigger only when bot confirms it has noted the client's details
+      // look for client email in USER messages only (not assistant messages which contain bilanj159@gmail.com)
       var lower = text.toLowerCase();
-      if((lower.indexOf('noted') > -1 || lower.indexOf('reach out') > -1 || lower.indexOf('pass') > -1) && lower.indexOf('@') > -1){
-        // extract email from conversation
-        var emailMatch = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
-        var leadEmail = emailMatch ? emailMatch[0] : 'unknown';
-        // find name from previous messages
-        var fullConvo = history.map(function(m){ return m.role + ': ' + m.content; }).join('\n');
+      var confirmed = lower.indexOf("reach out") > -1 || lower.indexOf("he'll be in touch") > -1 || lower.indexOf("noted that down") > -1;
+      if(confirmed){
+        // extract email from user messages only
+        var userEmails = history
+          .filter(function(m){ return m.role === 'user'; })
+          .map(function(m){ return m.content; })
+          .join(' ');
+        var emailMatch = userEmails.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+        var leadEmail = emailMatch ? emailMatch[0] : 'no email provided';
+        var fullConvo = history.map(function(m){ return m.role.toUpperCase() + ': ' + m.content; }).join('\n\n');
         fetch('https://formspree.io/f/mkjnbygj', {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
