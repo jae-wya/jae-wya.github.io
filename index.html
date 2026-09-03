@@ -1106,13 +1106,13 @@
 <div id="chat-box" role="dialog" aria-label="Chat">
   <div id="chat-head">
     <div>
-      <strong>Ask Jae's AI</strong>
-      <span>AI · not the real Jae</span>
+      <strong>Kiwi</strong>
+      <span>AI assistant · not the real Jae</span>
     </div>
     <button id="chat-close" aria-label="Close">&#x2715;</button>
   </div>
   <div id="chat-msgs">
-    <div class="cm bot">Hey — I'm an AI trained on Jae's work. Ask me about what he's built, his stack, or how he approaches a problem. Want to talk to the real Jae? Say the word.</div>
+    <div class="cm bot">Hey — I'm Kiwi, Jae's AI assistant. Ask me about what he's built, his stack, or how he approaches a problem. Want the real Jae? Say the word.</div>
   </div>
   <div id="chat-form">
     <textarea id="chat-input" rows="1" placeholder="Ask something…" maxlength="500"></textarea>
@@ -1206,7 +1206,7 @@
       read();
     }).catch(function(){
       typing.remove();
-      addMsg('err','Could not reach the server. It may be waking up — wait 30 seconds and try again.');
+      addMsg('err','Server is waking up (free tier cold start). Wait 30 seconds and try again.');
       setDisabled(false);
     });
   }
